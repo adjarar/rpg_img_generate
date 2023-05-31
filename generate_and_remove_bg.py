@@ -8,29 +8,32 @@ from upload_to_fileio import upload_to_fileio
 from txt2img_batch_generate import txt2img_batch_generate
 from remove_background import remove_background
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="txt2img script")
-    parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help="sd URL")
-    parser.add_argument("--prompts", type=str, required=True, help="Path to the JSON file containing prompts")
-    parser.add_argument("--output_dir_with_bg", type=str, default=os.path.join(os.getcwd(), "with_bg"), help="Output directory")
-    parser.add_argument("--output_dir_without_bg", type=str, default=os.path.join(os.getcwd(), "without_bg"), help="Output directory")
-    parser.add_argument("--prefix", type=str, default="", help="optional string for identification")
-    parser.add_argument("--steps", type=int, default=5, help="Number of steps")
-    parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
-    parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
-    args = parser.parse_args()
+webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
+prompts_dir = os.path.join(os.getcwd(), 'prompts')
 
-    # for each prompt itterate over the following in the folder of prompts
+parser = argparse.ArgumentParser(description="txt2img script")
+parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help="sd URL")
+#parser.add_argument("--prompts", type=str, required=True, help="Path to the JSON file containing prompts")
+parser.add_argument("--output_dir_with_bg", type=str, default=os.path.join(os.getcwd(), "with_bg"), help="Output directory")
+parser.add_argument("--output_dir_without_bg", type=str, default=os.path.join(os.getcwd(), "without_bg"), help="Output directory")
+parser.add_argument("--prefix", type=str, default="", help="optional string for identification")
+parser.add_argument("--steps", type=int, default=5, help="Number of steps")
+parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
+parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
+args = parser.parse_args()
 
-    webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
 
+# for each prompt itterate over the following in the folder of prompts
+for prompt_name in os.listdir(prompts_dir):
+
+    prompt_path = os.path.join(prompts_dir, prompt_name)
     # loads the json prompts
-    with open(args.prompts, 'r') as prompts_file:
+    with open(prompt_path, 'r') as prompts_file:
         prompts_file = json.load(prompts_file)
 
     prompts_name = prompts_file["name"]
     prompts = prompts_file["prompts"]
-    
+
     with_bg_dir_name = "_".join([prompts_name, "with_bg"])
     without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
@@ -51,7 +54,7 @@ if __name__ == "__main__":
 
     # upload to file.io and get the download link
     file_url = upload_to_fileio(with_bg_dir_path + ".zip")
-    
+
     # post the link to discord
     webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
@@ -64,3 +67,5 @@ if __name__ == "__main__":
     # upload bg zip to file.io
     file_url = upload_to_fileio(without_bg_dir_path + ".zip")
     webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
+
+# TODO: destroy the vast.ai pod
