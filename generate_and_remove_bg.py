@@ -16,7 +16,8 @@ parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help=
 parser.add_argument("--steps", type=int, default=5, help="Number of steps")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
-parser.add_argument('--destroy_pod_when_finished', action='store_true', help='Destroy the pod when the script finshed executing')
+parser.add_argument('--destroy_pod', action='store_true', help='Destroy the pod when the script finshed executing')
+parser.add_argument("--upload", action="store_true", help="upload the outputs to fileio")
 
 args = parser.parse_args()
 
@@ -37,8 +38,9 @@ for prompt_name in os.listdir(prompts_dir):
     with_bg_dir_name = "_".join([prompts_name, "with_bg"])
     without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
-    with_bg_dir_path = os.path.join(os.getcwd(), with_bg_dir_name)
-    without_bg_dir_path = os.path.join(os.getcwd(), without_bg_dir_name)
+    output_dir_path = os.path.join(os.getcwd(), "output")
+    with_bg_dir_path = os.path.join(output_dir_path, with_bg_dir_name)
+    without_bg_dir_path = os.path.join(output_dir_path, without_bg_dir_name)
 
     os.makedirs(with_bg_dir_path)
     os.makedirs(without_bg_dir_path)
@@ -49,11 +51,10 @@ for prompt_name in os.listdir(prompts_dir):
     # generate images
     txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, prompts_name, args.steps, args.batch_size, args.iterations)
 
-    # zip the folder
-    shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
-
-    # upload to file.io and get the download link
-    file_url = upload_to_fileio(with_bg_dir_path + ".zip")
+    # zip and upload the folder
+    if args.upload:
+        shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
+        file_url = upload_to_fileio(with_bg_dir_path + ".zip")
 
     # post the link to discord
     webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
@@ -61,11 +62,11 @@ for prompt_name in os.listdir(prompts_dir):
     # remove bg
     remove_background(with_bg_dir_path, without_bg_dir_path)
 
-    # zip bg images
-    shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
+    # zip and upload bg images
+    if args.upload:
+        shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
+        file_url = upload_to_fileio(without_bg_dir_path + ".zip")
 
-    # upload bg zip to file.io
-    file_url = upload_to_fileio(without_bg_dir_path + ".zip")
     webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
 
 # send final finished message
