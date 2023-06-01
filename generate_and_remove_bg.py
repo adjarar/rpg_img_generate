@@ -18,6 +18,7 @@ parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
 parser.add_argument('--destroy_pod', action='store_true', help='Destroy the pod when the script finshed executing')
 parser.add_argument("--upload", action="store_true", help="upload the outputs to fileio")
+parser.add_argument("--ouput_dir_path", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
 
 args = parser.parse_args()
 
@@ -38,9 +39,8 @@ for prompt_name in os.listdir(prompts_dir):
     with_bg_dir_name = "_".join([prompts_name, "with_bg"])
     without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
-    output_dir_path = os.path.join(os.getcwd(), "output")
-    with_bg_dir_path = os.path.join(output_dir_path, with_bg_dir_name)
-    without_bg_dir_path = os.path.join(output_dir_path, without_bg_dir_name)
+    with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
+    without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
 
     os.makedirs(with_bg_dir_path)
     os.makedirs(without_bg_dir_path)
@@ -57,7 +57,6 @@ for prompt_name in os.listdir(prompts_dir):
         file_url = upload_to_fileio(with_bg_dir_path + ".zip")
         webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
-    # remove bg
     remove_background(with_bg_dir_path, without_bg_dir_path)
 
     # zip and upload bg images
