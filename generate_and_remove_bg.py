@@ -68,5 +68,5 @@ for prompt_name in os.listdir(prompts_dir):
 # send final finished message
 webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
 
-if args.destroy_pod_when_finished:
+if args.destroy_pod:
     os.system("./vast stop instance ${VAST_CONTAINERLABEL:2}")
