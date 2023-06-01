@@ -41,9 +41,11 @@ while len(os.listdir(prompts_dir)) != 0:
 
     with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
     without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
+    processed_prompts_dir_path = os.path.join(os.getcwd(), "processed_prompts")
 
     os.makedirs(with_bg_dir_path)
     os.makedirs(without_bg_dir_path)
+    os.makedirs(processed_prompts_dir_path)
 
     # loads the correct model
     requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
@@ -64,6 +66,9 @@ while len(os.listdir(prompts_dir)) != 0:
         shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
         file_url = upload_to_fileio(without_bg_dir_path + ".zip")
         webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
+    
+    # move the prompt to the processed folder
+    shutil.move(prompt_path, processed_prompts_dir_path)
 
 # send final finished message
 webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
