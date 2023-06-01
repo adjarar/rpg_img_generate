@@ -16,6 +16,8 @@ parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help=
 parser.add_argument("--steps", type=int, default=5, help="Number of steps")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
+parser.add_argument('--destroy_pod_when_finished', action='store_true', help='Destroy the pod when the script finshed executing')
+
 args = parser.parse_args()
 
 
@@ -66,8 +68,8 @@ for prompt_name in os.listdir(prompts_dir):
     file_url = upload_to_fileio(without_bg_dir_path + ".zip")
     webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
 
-# TODO: destroy the vast.ai pod
-
+# send final finished message
 webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
 
-os.system("./vast stop instance ${VAST_CONTAINERLABEL:2}")
+if args.destroy_pod_when_finished:
+    os.system("./vast stop instance ${VAST_CONTAINERLABEL:2}")
