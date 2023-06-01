@@ -24,9 +24,9 @@ args = parser.parse_args()
 
 
 # for each prompt itterate over the following in the folder of prompts
-for prompt_name in os.listdir(prompts_dir):
+while len(os.listdir(prompts_dir)) != 0:
 
-    prompt_path = os.path.join(prompts_dir, prompt_name)
+    prompt_path = os.path.join(prompts_dir, os.listdir(prompts_dir)[0])
     
     # loads the json prompts
     with open(prompt_path, 'r') as prompts_file:
