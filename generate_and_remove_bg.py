@@ -27,7 +27,9 @@ args = parser.parse_args()
 while len(os.listdir(prompts_dir)) > 0:
 
     prompt_path = os.path.join(prompts_dir, os.listdir(prompts_dir)[0])
-    
+
+    processed_prompts_dir_path = os.path.join(os.getcwd(), "processed_prompts")
+
     # loads the json prompts
     with open(prompt_path, 'r') as prompts_file:
         prompts_file = json.load(prompts_file)
@@ -44,13 +46,10 @@ while len(os.listdir(prompts_dir)) > 0:
 
     with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
     without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
-    processed_prompts_dir_path = os.path.join(os.getcwd(), "processed_prompts")
 
     os.makedirs(with_bg_dir_path)
     os.makedirs(without_bg_dir_path)
     os.makedirs(processed_prompts_dir_path)
-
-    
 
     # loads the correct model
     requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
