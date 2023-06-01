@@ -12,11 +12,7 @@ webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyi
 prompts_dir = os.path.join(os.getcwd(), 'prompts')
 
 parser = argparse.ArgumentParser(description="txt2img script")
-parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help="sd URL")
-#parser.add_argument("--prompts", type=str, required=True, help="Path to the JSON file containing prompts")
-parser.add_argument("--output_dir_with_bg", type=str, default=os.path.join(os.getcwd(), "with_bg"), help="Output directory")
-parser.add_argument("--output_dir_without_bg", type=str, default=os.path.join(os.getcwd(), "without_bg"), help="Output directory")
-parser.add_argument("--prefix", type=str, default="", help="optional string for identification")
+parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help="Stable Diffusion URL")
 parser.add_argument("--steps", type=int, default=5, help="Number of steps")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
@@ -27,10 +23,12 @@ args = parser.parse_args()
 for prompt_name in os.listdir(prompts_dir):
 
     prompt_path = os.path.join(prompts_dir, prompt_name)
+    
     # loads the json prompts
     with open(prompt_path, 'r') as prompts_file:
         prompts_file = json.load(prompts_file)
 
+    # put the json elements in a variable
     prompts_name = prompts_file["name"]
     prompts = prompts_file["prompts"]
 
@@ -47,7 +45,7 @@ for prompt_name in os.listdir(prompts_dir):
     requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
     # generate images
-    txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, args.prefix, args.steps, args.batch_size, args.iterations)
+    txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, prompts_name, args.steps, args.batch_size, args.iterations)
 
     # zip the folder
     shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
@@ -69,3 +67,7 @@ for prompt_name in os.listdir(prompts_dir):
     webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
 
 # TODO: destroy the vast.ai pod
+
+webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
+
+os.system("./vast stop instance ${VAST_CONTAINERLABEL:2}")
