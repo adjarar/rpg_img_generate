@@ -4,12 +4,14 @@ import argparse
 import os
 import json
 import shutil
+import time
 from upload_to_fileio import upload_to_fileio
 from txt2img_batch_generate import txt2img_batch_generate
 from remove_background import remove_background
 
 webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
 prompts_dir = os.path.join(os.getcwd(), 'prompts')
+poll_interval = 5
 
 parser = argparse.ArgumentParser(description="txt2img script")
 parser.add_argument("--sd_url", type=str, default="http://localhost:7860", help="Stable Diffusion URL")
@@ -23,56 +25,58 @@ parser.add_argument("--output_dir_path", type=str, default=os.path.join(os.getcw
 args = parser.parse_args()
 
 
-# for each prompt itterate over the following in the folder of prompts
-while len(os.listdir(prompts_dir)) > 0:
+# continue working as long as there are prompts in the prompt dir
+while True:
 
     prompt_path = os.path.join(prompts_dir, os.listdir(prompts_dir)[0])
 
-    processed_prompts_dir_path = os.path.join(os.getcwd(), "processed_prompts")
+    if prompt_path:
 
-    # loads the json prompts
-    with open(prompt_path, 'r') as prompts_file:
-        prompts_file = json.load(prompts_file)
+        # loads the json prompts
+        with open(prompt_path, 'r') as prompts_file:
+            prompts_file = json.load(prompts_file)
+        
+        # delete the prompt file
+        os.remove(prompt_path)
+
+        # put the json elements in a variable
+        prompts_name = prompts_file["name"]
+        prompts = prompts_file["prompts"]
+
+        with_bg_dir_name = "_".join([prompts_name, "with_bg"])
+        without_bg_dir_name = "_".join([prompts_name, "without_bg"])
+
+        with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
+        without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
+
+        os.makedirs(with_bg_dir_path)
+        os.makedirs(without_bg_dir_path)
+
+        # loads the correct model
+        requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
+
+        # generate images
+        txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, prompts_name, args.steps, args.batch_size, args.iterations)
+
+        # zip and upload the folder
+        if args.upload:
+            shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
+            file_url = upload_to_fileio(with_bg_dir_path + ".zip")
+            webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
+
+        remove_background(with_bg_dir_path, without_bg_dir_path)
+
+        # zip and upload bg images
+        if args.upload:
+            shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
+            file_url = upload_to_fileio(without_bg_dir_path + ".zip")
+            webhook.send(f'Finished removing backgrounds from {prompts_name}. Download: {file_url}', username='Image Generator')
+
+        if len(os.listdir(prompts_dir)) == 0:
+            webhook.send("Finished all work, waiting for more.", username="Done")
+    elif args.destroy_pod:
+        break
     
-    # delete file
-    os.remove(prompt_path)
-
-    # put the json elements in a variable
-    prompts_name = prompts_file["name"]
-    prompts = prompts_file["prompts"]
-
-    with_bg_dir_name = "_".join([prompts_name, "with_bg"])
-    without_bg_dir_name = "_".join([prompts_name, "without_bg"])
-
-    with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
-    without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
-
-    os.makedirs(with_bg_dir_path)
-    os.makedirs(without_bg_dir_path)
-
-    # loads the correct model
-    requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
-
-    # generate images
-    txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, prompts_name, args.steps, args.batch_size, args.iterations)
-
-    # zip and upload the folder
-    if args.upload:
-        shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
-        file_url = upload_to_fileio(with_bg_dir_path + ".zip")
-        webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
-
-    remove_background(with_bg_dir_path, without_bg_dir_path)
-
-    # zip and upload bg images
-    if args.upload:
-        shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
-        file_url = upload_to_fileio(without_bg_dir_path + ".zip")
-        webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
+    time.sleep(poll_interval)
     
-
-# send final finished message
-webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
-
-if args.destroy_pod:
-    os.system("./vast stop instance ${VAST_CONTAINERLABEL:2}")
+os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
