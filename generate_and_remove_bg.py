@@ -31,6 +31,9 @@ while len(os.listdir(prompts_dir)) > 0:
     # loads the json prompts
     with open(prompt_path, 'r') as prompts_file:
         prompts_file = json.load(prompts_file)
+    
+    # move the prompt to the processed folder
+    shutil.move(prompt_path, processed_prompts_dir_path)
 
     # put the json elements in a variable
     prompts_name = prompts_file["name"]
@@ -47,8 +50,7 @@ while len(os.listdir(prompts_dir)) > 0:
     os.makedirs(without_bg_dir_path)
     os.makedirs(processed_prompts_dir_path)
 
-    # move the prompt to the processed folder
-    shutil.move(prompt_path, processed_prompts_dir_path)
+    
 
     # loads the correct model
     requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
