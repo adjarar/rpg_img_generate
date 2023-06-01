@@ -55,9 +55,7 @@ for prompt_name in os.listdir(prompts_dir):
     if args.upload:
         shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
         file_url = upload_to_fileio(with_bg_dir_path + ".zip")
-
-    # post the link to discord
-    webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
+        webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
     # remove bg
     remove_background(with_bg_dir_path, without_bg_dir_path)
@@ -66,8 +64,7 @@ for prompt_name in os.listdir(prompts_dir):
     if args.upload:
         shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
         file_url = upload_to_fileio(without_bg_dir_path + ".zip")
-
-    webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
+        webhook.send(f'Finished generating {prompts_name} no bg images. Download: {file_url}', username='Image Generator')
 
 # send final finished message
 webhook.send("Finished generating images and removing backgrounds", username="Finished All Jobs")
