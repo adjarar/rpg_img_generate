@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 
 # for each prompt itterate over the following in the folder of prompts
-while len(os.listdir(prompts_dir)) != 0:
+while len(os.listdir(prompts_dir)) > 0:
 
     prompt_path = os.path.join(prompts_dir, os.listdir(prompts_dir)[0])
     
