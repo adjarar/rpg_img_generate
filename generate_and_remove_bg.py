@@ -18,7 +18,7 @@ parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
 parser.add_argument('--destroy_pod', action='store_true', help='Destroy the pod when the script finshed executing')
 parser.add_argument("--upload", action="store_true", help="upload the outputs to fileio")
-parser.add_argument("--ouput_dir_path", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
+parser.add_argument("--output_dir_path", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
 
 args = parser.parse_args()
 
