@@ -33,7 +33,7 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
             decoded_img.save(output_file)
 
         if verbose:
-            print(f"Done generating and saving prompt: {prompt} ({prompt_number} / {len(prompts)})")
+            print(f"Done processing prompt: {prompt} ({prompt_number} / {len(prompts)})")
 
 
 if __name__ == "__main__":

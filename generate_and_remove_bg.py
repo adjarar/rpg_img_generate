@@ -94,6 +94,9 @@ while True:
 
     elif args.destroy_pod:
         break
+
+    if args.vebose:
+        print("Waiting for work")
     
     time.sleep(poll_interval)
     

@@ -20,7 +20,7 @@ def remove_background(input_dir: str, output_dir: str, vebose=False):
         img_bg_removed.save(output_img_path)
 
         if vebose:
-            print(f"Done removing background and saving of: {img_path} ( {i} / {len(images)})")
+            print(f"Done removing background and saving of: {img_path} ({i} / {len(images)})")
 
 
 if __name__ == "__main__":
