@@ -85,12 +85,12 @@ while True:
             print(f"Done uploading {prompts_name} without_bg images to file.io.")
             webhook.send(f'Finished removing backgrounds from {prompts_name}. Download: {file_url}', username='Image Generator')
 
-        if len(os.listdir(prompts_dir)) == 0:
-            webhook.send("Finished all work, waiting for more.", username="Done")
-
         # prompt file is no longer needed delete it
         os.remove(prompt_paths[0])
-        print(f"Finished all work on {prompts_name}.")
+        print(f"Finished work on {prompts_name}.")
+
+        if len(os.listdir(prompts_dir)) == 0:
+            webhook.send("Finished all work, waiting for more.", username="Done")
 
     elif args.destroy_pod:
         break

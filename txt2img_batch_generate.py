@@ -21,9 +21,6 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
             "sampler_name": "Euler a",
         }
 
-        if verbose:
-            print(f"Generating prompt: {prompt}")
-        
         response_json = response2json(sd_url, 'txt2img', payload)
 
         for i, encoded_img in enumerate(response_json['images']):
@@ -36,7 +33,7 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
             decoded_img.save(output_file)
 
         if verbose:
-            print(f"Done generating and saving prompt: {prompt}")
+            print(f"Done generating and saving prompt: {prompt} ({prompt_number} / {len(prompts)})")
 
 
 if __name__ == "__main__":

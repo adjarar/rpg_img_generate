@@ -7,20 +7,21 @@ from PIL import Image
 
 def remove_background(input_dir: str, output_dir: str, vebose=False):
 
-    for img_file in os.listdir(input_dir):
+    images = os.listdir(input_dir)
+
+    for i, img_file in enumerate(images):
         img_path = os.path.join(input_dir, img_file)
 
-        if vebose:
-            print(f"Removing background of: {img_path}")
-        
         img = Image.open(img_path)
         img_bg_removed = remove(img)
 
-        if vebose:
-            print(f"Done removing background of: {img_path}")
-
+        
         output_img_path = os.path.join(output_dir, img_file.replace(".png", "_without_bg.png"))
         img_bg_removed.save(output_img_path)
+
+        if vebose:
+            print(f"Done removing background and saving of: {img_path} ( {i} / {images})")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="remove background of the image")
