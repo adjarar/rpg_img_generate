@@ -47,6 +47,8 @@ while True:
         prompts_name = prompts_file["name"]
         prompts = prompts_file["prompts"]
 
+        print(f"Starting work on {prompts_name}.")
+
         with_bg_dir_name = "_".join([prompts_name, "with_bg"])
         without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
@@ -59,22 +61,27 @@ while True:
         # loads the correct model
         requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
-        print("Generating images...")
+        print(f"Generating {prompts_name} images...")
         txt2img_batch_generate(args.sd_url, prompts, with_bg_dir, prompts_name, args.steps, args.batch_size, args.iterations)
 
         # zip and upload the folder
         if args.upload:
             shutil.make_archive(with_bg_dir, 'zip', with_bg_dir)
+           
+            print(f"Uploading {prompts_name} with_bg images to file.io.")
             file_url = upload_to_fileio(with_bg_dir + ".zip")
+            print(f"Done uploading {prompts_name} with_bg images to file.io.")
             webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
-        print("Removing backgrounds...")
+        print(f"Removing {prompts_name} backgrounds...")
         remove_background(with_bg_dir, without_bg_dir)
 
         # zip and upload bg images
         if args.upload:
             shutil.make_archive(without_bg_dir, 'zip', without_bg_dir)
+            print(f"Uploading {prompts_name} without_bg images to file.io.")
             file_url = upload_to_fileio(without_bg_dir + ".zip")
+            print(f"Done uploading {prompts_name} without_bg images to file.io.")
             webhook.send(f'Finished removing backgrounds from {prompts_name}. Download: {file_url}', username='Image Generator')
 
         if len(os.listdir(prompts_dir)) == 0:
@@ -82,6 +89,7 @@ while True:
 
         # prompt file is no longer needed delete it
         os.remove(prompt_paths[0])
+        print(f"Finished all work on {prompts_name}.")
 
     elif args.destroy_pod:
         break
