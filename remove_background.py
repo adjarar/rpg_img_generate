@@ -5,13 +5,19 @@ from sd_api_tools import *
 import discord
 from PIL import Image
 
-def remove_background(input_dir: str, output_dir: str):
+def remove_background(input_dir: str, output_dir: str, vebose=False):
 
     for img_file in os.listdir(input_dir):
         img_path = os.path.join(input_dir, img_file)
 
+        if vebose:
+            print(f"Removing background of: {img_path}")
+        
         img = Image.open(img_path)
         img_bg_removed = remove(img)
+
+        if vebose:
+            print(f"Done removing background of: {img_path}")
 
         output_img_path = os.path.join(output_dir, img_file.replace(".png", "_without_bg.png"))
         img_bg_removed.save(output_img_path)

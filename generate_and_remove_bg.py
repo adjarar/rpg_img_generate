@@ -22,6 +22,7 @@ parser.add_argument('--destroy_pod', action='store_true', help='Destroy the pod 
 parser.add_argument("--upload", action="store_true", help="upload the outputs to fileio")
 parser.add_argument("--output_dir", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
 parser.add_argument("--prompts_dir", type=str, default=os.path.join(os.getcwd(), "prompts"), help="the prompts directory")
+parser.add_argument("--verbose", type=bool, action="store_true", default=False)
 
 args = parser.parse_args()
 
@@ -74,7 +75,7 @@ while True:
             webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
         print(f"Removing {prompts_name} backgrounds...")
-        remove_background(with_bg_dir, without_bg_dir)
+        remove_background(with_bg_dir, without_bg_dir, args.verbose)
 
         # zip and upload bg images
         if args.upload:
