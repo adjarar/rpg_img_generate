@@ -63,7 +63,7 @@ while True:
         requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
         print(f"Generating {prompts_name} images...")
-        txt2img_batch_generate(args.sd_url, prompts, with_bg_dir, prompts_name, args.steps, args.batch_size, args.iterations)
+        txt2img_batch_generate(args.sd_url, prompts, with_bg_dir, prompts_name, args.steps, args.batch_size, args.iterations, args.verbose)
 
         # zip and upload the folder
         if args.upload:
