@@ -9,7 +9,7 @@ def remove_background(input_dir: str, output_dir: str, vebose=False):
 
     images = os.listdir(input_dir)
 
-    for i, img_file in enumerate(images):
+    for i, img_file in enumerate(images, start=1):
         img_path = os.path.join(input_dir, img_file)
 
         img = Image.open(img_path)

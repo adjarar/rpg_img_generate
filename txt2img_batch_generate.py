@@ -11,7 +11,7 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
     """
         Takes a json file of prompts and runs them through txt2img.
     """
-    for prompt_number, prompt in enumerate(prompts):
+    for prompt_number, prompt in enumerate(prompts, start=1):
         payload = {
             "steps": steps,
             "batch_size": batch_size,
