@@ -59,7 +59,7 @@ while True:
         # loads the correct model
         requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
-        # generate images
+        print("Generating images...")
         txt2img_batch_generate(args.sd_url, prompts, with_bg_dir, prompts_name, args.steps, args.batch_size, args.iterations)
 
         # zip and upload the folder
@@ -68,6 +68,7 @@ while True:
             file_url = upload_to_fileio(with_bg_dir + ".zip")
             webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
+        print("Removing backgrounds...")
         remove_background(with_bg_dir, without_bg_dir)
 
         # zip and upload bg images
