@@ -10,7 +10,6 @@ from txt2img_batch_generate import txt2img_batch_generate
 from remove_background import remove_background
 
 webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
-prompts_dir = os.path.join(os.getcwd(), 'prompts')
 poll_interval = 5
 
 parser = argparse.ArgumentParser(description="txt2img script")
@@ -20,9 +19,16 @@ parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
 parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
 parser.add_argument('--destroy_pod', action='store_true', help='Destroy the pod when the script finshed executing')
 parser.add_argument("--upload", action="store_true", help="upload the outputs to fileio")
-parser.add_argument("--output_dir_path", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
+parser.add_argument("--output_dir", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
+parser.add_argument("--prompts_dir", type=str, default=os.path.join(os.getcwd(), "prompts"), help="the prompts directory")
 
 args = parser.parse_args()
+
+prompts_dir = args.prompts_dir
+output_dir = args.output_dir
+
+os.makedirs(prompts_dir, exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
 
 # continue working as long as there are prompts in the prompt dir
@@ -49,8 +55,8 @@ while True:
         with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
         without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
 
-        os.makedirs(with_bg_dir_path)
-        os.makedirs(without_bg_dir_path)
+        os.makedirs(with_bg_dir_path, exist_ok=True)
+        os.makedirs(without_bg_dir_path, exist_ok=True)
 
         # loads the correct model
         requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
@@ -74,6 +80,7 @@ while True:
 
         if len(os.listdir(prompts_dir)) == 0:
             webhook.send("Finished all work, waiting for more.", username="Done")
+            
     elif args.destroy_pod:
         break
     
