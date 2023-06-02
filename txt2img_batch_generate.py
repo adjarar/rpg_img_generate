@@ -7,7 +7,7 @@ from sd_api_tools import *
 
 
 def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
-                            prefix: str, steps: int, batch_size: int, iterations: int):
+                            prefix: str, steps: int, batch_size: int, iterations: int, verbose=False):
     """
         Takes a json file of prompts and runs them through txt2img.
     """
@@ -21,6 +21,9 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
             "sampler_name": "Euler a",
         }
 
+        if verbose:
+            print(f"Generating prompt: {prompt}")
+        
         response_json = response2json(sd_url, 'txt2img', payload)
 
         for i, encoded_img in enumerate(response_json['images']):
@@ -31,6 +34,9 @@ def txt2img_batch_generate(sd_url: str, prompts: json, output_dir_with_bg: str,
             decoded_img = decode_img(encoded_img)
             output_file = os.path.join(output_dir_with_bg, "_".join([prefix, str(prompt_number), str(i)])) + '.png'
             decoded_img.save(output_file)
+
+        if verbose:
+            print(f"Done generating and saving prompt: {prompt}")
 
 
 if __name__ == "__main__":
@@ -43,6 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("--steps", type=int, default=5, help="Number of steps")
     parser.add_argument("--batch_size", type=int, default=1, help="Batch size")
     parser.add_argument("--iterations", type=int, default=1, help="Number of iterations")
+    parser.add_argument("--verbose", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -52,7 +59,7 @@ if __name__ == "__main__":
     requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
     txt2img_batch_generate(args.sd_url, prompts, args.output_dir_with_bg, args.prefix,
-                     args.steps, args.batch_size, args.iterations)
+                     args.steps, args.batch_size, args.iterations, args.verbose)
     
     webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
     webhook.send('Finnished generating images', username='Image Generator')

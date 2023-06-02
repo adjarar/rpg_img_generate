@@ -26,10 +26,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="remove background of the image")
     parser.add_argument("--input_dir", required=True, help="the input directory")
     parser.add_argument("--output_dir", required=True, help="the output directory")
+    parser.add_argument("--verbose", action="store_true", default=False)
 
     args = parser.parse_args()
 
-    remove_background(args.input_dir, args.output_dir)
+    remove_background(args.input_dir, args.output_dir, args.verbose)
 
     webhook = discord.SyncWebhook.partial(1108891310351470662, '5Q-A_WqDX7Iiu6Y30oyifxGHdfL2PeErrW0MWA5kFjRTcGXbMv_Sv6NmtXhIwiOX0hf_')
     webhook.send('Finnished removing backgrounds', username='Background Remover')
