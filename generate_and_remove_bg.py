@@ -42,8 +42,7 @@ while True:
         with open(prompt_path, 'r') as prompts_file:
             prompts_file = json.load(prompts_file)
         
-        # delete the prompt file
-        os.remove(prompt_path)
+        
 
         # put the json elements in a variable
         prompts_name = prompts_file["name"]
@@ -80,6 +79,9 @@ while True:
 
         if len(os.listdir(prompts_dir)) == 0:
             webhook.send("Finished all work, waiting for more.", username="Done")
+
+        # prompt file is no longer needed delete it
+        os.remove(prompt_path)
 
     elif args.destroy_pod:
         break
