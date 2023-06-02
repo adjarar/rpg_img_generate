@@ -5,6 +5,7 @@ import os
 import json
 import shutil
 import time
+import glob
 from upload_to_fileio import upload_to_fileio
 from txt2img_batch_generate import txt2img_batch_generate
 from remove_background import remove_background
@@ -34,16 +35,14 @@ os.makedirs(output_dir, exist_ok=True)
 # continue working as long as there are prompts in the prompt dir
 while True:
 
-    if len(os.listdir(prompts_dir)) > 0:
+    prompt_paths = glob.glob(os.path.join(prompts_dir, "*.json"))
 
-        prompt_path = os.path.join(prompts_dir, os.listdir(prompts_dir)[0])
+    if len(prompt_paths) > 0:
 
         # loads the json prompts
-        with open(prompt_path, 'r') as prompts_file:
+        with open(prompt_paths[0], 'r') as prompts_file:
             prompts_file = json.load(prompts_file)
         
-        
-
         # put the json elements in a variable
         prompts_name = prompts_file["name"]
         prompts = prompts_file["prompts"]
@@ -81,7 +80,7 @@ while True:
             webhook.send("Finished all work, waiting for more.", username="Done")
 
         # prompt file is no longer needed delete it
-        os.remove(prompt_path)
+        os.remove(prompt_paths[0])
 
     elif args.destroy_pod:
         break
