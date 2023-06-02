@@ -52,35 +52,35 @@ while True:
         with_bg_dir_name = "_".join([prompts_name, "with_bg"])
         without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
-        with_bg_dir_path = os.path.join(args.output_dir_path, with_bg_dir_name)
-        without_bg_dir_path = os.path.join(args.output_dir_path, without_bg_dir_name)
+        with_bg_dir = os.path.join(output_dir, with_bg_dir_name)
+        without_bg_dir = os.path.join(output_dir, without_bg_dir_name)
 
-        os.makedirs(with_bg_dir_path, exist_ok=True)
-        os.makedirs(without_bg_dir_path, exist_ok=True)
+        os.makedirs(with_bg_dir, exist_ok=True)
+        os.makedirs(without_bg_dir, exist_ok=True)
 
         # loads the correct model
         requests.post(url=f'{args.sd_url}/sdapi/v1/options', json={"sd_model_checkpoint": "fantassifiedIcons_fantassifiedIconsV20.safetensors [8340e74c3e]"})
 
         # generate images
-        txt2img_batch_generate(args.sd_url, prompts, with_bg_dir_path, prompts_name, args.steps, args.batch_size, args.iterations)
+        txt2img_batch_generate(args.sd_url, prompts, with_bg_dir, prompts_name, args.steps, args.batch_size, args.iterations)
 
         # zip and upload the folder
         if args.upload:
-            shutil.make_archive(with_bg_dir_path, 'zip', with_bg_dir_path)
-            file_url = upload_to_fileio(with_bg_dir_path + ".zip")
+            shutil.make_archive(with_bg_dir, 'zip', with_bg_dir)
+            file_url = upload_to_fileio(with_bg_dir + ".zip")
             webhook.send(f'Finished generating {prompts_name} images. Download: {file_url}', username='Image Generator')
 
-        remove_background(with_bg_dir_path, without_bg_dir_path)
+        remove_background(with_bg_dir, without_bg_dir)
 
         # zip and upload bg images
         if args.upload:
-            shutil.make_archive(without_bg_dir_path, 'zip', without_bg_dir_path)
-            file_url = upload_to_fileio(without_bg_dir_path + ".zip")
+            shutil.make_archive(without_bg_dir, 'zip', without_bg_dir)
+            file_url = upload_to_fileio(without_bg_dir + ".zip")
             webhook.send(f'Finished removing backgrounds from {prompts_name}. Download: {file_url}', username='Image Generator')
 
         if len(os.listdir(prompts_dir)) == 0:
             webhook.send("Finished all work, waiting for more.", username="Done")
-            
+
     elif args.destroy_pod:
         break
     
