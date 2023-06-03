@@ -16,7 +16,7 @@ def remove_background(input_dir: str, output_dir: str, vebose=False):
         img_bg_removed = remove(img)
 
         
-        output_img_path = os.path.join(output_dir, img_file.replace(".png", "_without_bg.png"))
+        output_img_path = os.path.join(output_dir, img_file)
         img_bg_removed.save(output_img_path)
 
         if vebose:
