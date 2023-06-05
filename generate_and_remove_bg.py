@@ -97,9 +97,12 @@ while True:
         break
 
     if args.verbose:
+        
+        if  args.destroy:
+            print("Destroying pod...")
+            os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
+
         print("Waiting for work")
     
     time.sleep(poll_interval)
 
-if  args.destroy:   
-    os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
