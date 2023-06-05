@@ -52,8 +52,8 @@ while True:
 
         print(f"Starting work on {prompts_name}.")
 
-        with_bg_dir_name = "_".join([prompts_name, "with_bg_generated"])
-        without_bg_dir_name = "_".join([prompts_name, "without_bg_generated"])
+        with_bg_dir_name = "_".join([prompts_name, "with_bg"])
+        without_bg_dir_name = "_".join([prompts_name, "without_bg"])
 
         with_bg_dir = os.path.join(output_dir, with_bg_dir_name)
         without_bg_dir = os.path.join(output_dir, without_bg_dir_name)
