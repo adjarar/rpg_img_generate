@@ -6,6 +6,7 @@ import json
 import shutil
 import time
 import glob
+import subprocess
 from upload_to_fileio import upload_to_fileio
 from txt2img_batch_generate import txt2img_batch_generate
 from remove_background import remove_background
@@ -100,7 +101,7 @@ while True:
         
         if  args.destroy:
             print("Destroying pod...")
-            os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
+            subprocess.run("./vast destroy instance ${VAST_CONTAINERLABEL:2}", shell=True)
 
         print("Waiting for work")
     
