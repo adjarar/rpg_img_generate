@@ -23,6 +23,7 @@ parser.add_argument("--upload", action="store_true", help="upload the outputs to
 parser.add_argument("--output_dir", type=str, default=os.path.join(os.getcwd(), "output"), help="Output directory path")
 parser.add_argument("--prompts_dir", type=str, default=os.path.join(os.getcwd(), "prompts"), help="the prompts directory")
 parser.add_argument("--verbose", action="store_true", default=False)
+parser.add_argument("--destroy", action="store_true", default=False)
 
 args = parser.parse_args()
 
@@ -99,5 +100,6 @@ while True:
         print("Waiting for work")
     
     time.sleep(poll_interval)
-    
-os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
+
+if  args.destroy:   
+    os.system("./vast destroy instance ${VAST_CONTAINERLABEL:2}")
